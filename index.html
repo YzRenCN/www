@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://ys-j.ysepan.com/wap/yangrenhyx/Midl9F9jH7CKb3B/yc6fV85qaiSIG4C9ng3ibhE5ja8kc/unknown_plugin.png">
+    <title>123456轻松导航</title>
+    <!-- 防止深色模式闪烁 -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+    <script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                    },
+                    animation: {
+                        'gradient': 'gradient 15s ease infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .dark .glass {
+                background: rgba(30, 41, 59, 0.7);
+            }
+            .bg-gradient-animate {
+                background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+                background-size: 400% 400%;
+                animation: gradient 15s ease infinite;
+            }
+            .dark .bg-gradient-animate {
+                background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
+                background-size: 400% 400%;
+                animation: gradient 15s ease infinite;
+            }
+            .card-hover {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .card-hover:hover {
+                transform: translateY(-6px) scale(1.02);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .tab-active {
+                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+                color: white;
+                box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            }
+            /* 修复初始加载所有分类显示问题：默认隐藏所有分类内容，只显示常用 */
+            .tab-content {
+                display: none;
+            }
+            #content-common {
+                display: grid;
+            }
+        }
+    </style>
+    <style>
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-animate transition-colors duration-300">
+    <!-- 背景装饰 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-float" style="animation-delay: 0s"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-yellow-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+        <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-300 dark:bg-indigo-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-float" style="animation-delay: 4s"></div>
+    </div>
+
+    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16">
+        <!-- 顶部导航栏 -->
+        <header class="flex justify-between items-center mb-8 sm:mb-12">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-white drop-shadow-md">123456首页</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="time" class="text-white/90 text-sm sm:text-base font-medium drop-shadow-md hidden sm:block"></div>
+                <button id="themeToggle" class="w-10 h-10 rounded-full glass flex items-center justify-center text-gray-700 dark:text-white shadow-md hover:shadow-lg transition-shadow">
+                    <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 搜索区域 -->
+        <div class="mb-10">
+            <form id="searchForm" class="glass rounded-2xl shadow-xl p-2 flex items-center gap-2">
+                <select id="searchEngine" class="bg-transparent border-none outline-none text-gray-700 dark:text-gray-200 px-3 py-2 text-sm sm:text-base cursor-pointer rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                    <option value="https://www.baidu.com/s?wd=" class="text-gray-800">百度</option>
+                    <option value="https://www.google.com/search?q=" class="text-gray-800">谷歌</option>
+                    <option value="https://www.bing.com/search?q=" class="text-gray-800">必应</option>
+                    <option value="https://www.sogou.com/web?query=" class="text-gray-800">搜狗</option>
+                    <option value="https://www.zhihu.com/search?type=content&q=" class="text-gray-800">知乎</option>
+                    <option value="https://search.bilibili.com/all?keyword=" class="text-gray-800">B站</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="输入关键词，开启全网搜索..." class="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-white px-2 py-3 text-base placeholder-gray-500 dark:placeholder-gray-400" autocomplete="off">
+                <button type="submit" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl px-5 py-3 transition-all shadow-md hover:shadow-lg flex items-center gap-2 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <span class="hidden sm:inline">搜索</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-hide">
+            <button data-tab="common" class="tab-btn tab-active px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                常用
+            </button>
+            <button data-tab="social" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                社交
+            </button>
+            <button data-tab="video" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                视频
+            </button>
+            <button data-tab="shopping" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                购物
+            </button>
+            <button data-tab="tools" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                工具
+            </button>
+            <button data-tab="study" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                学习
+            </button>
+            <button data-tab="dev" class="tab-btn px-4 py-2 rounded-xl text-sm sm:text-base font-medium whitespace-nowrap transition-all duration-300 glass text-gray-700 dark:text-gray-200 hover:bg-white/90 dark:hover:bg-slate-700/80 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg>
+                开发
+            </button>
+        </div>
+
+        <!-- 网站卡片区域 -->
+        <div class="content-area">
+            <!-- 常用分类 -->
+            <div id="content-common" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://www.baidu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/baidu.com?size=64" alt="百度" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2932e1] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>百</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">百度</span>
+                </a>
+                <a href="https://www.google.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/google.com?size=64" alt="谷歌" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#4285f4] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>G</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">谷歌</span>
+                </a>
+                <a href="https://www.bing.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/bing.com?size=64" alt="必应" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#00809d] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>B</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">必应</span>
+                </a>
+                <a href="https://www.zhihu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/zhihu.com?size=64" alt="知乎" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#0066ff] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>知</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">知乎</span>
+                </a>
+                <a href="https://www.douyin.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/douyin.com?size=64" alt="抖音" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-black flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>抖</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">抖音</span>
+                </a>
+                <a href="https://www.kuaishou.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/kuaishou.com?size=64" alt="快手" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff4906] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>快</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">快手</span>
+                </a>
+                <a href="https://www.weibo.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/weibo.com?size=64" alt="微博" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#e6162d] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>微</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">微博</span>
+                </a>
+                <a href="https://www.xiaohongshu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/xiaohongshu.com?size=64" alt="小红书" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#fe2c55] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>红</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">小红书</span>
+                </a>
+            </div>
+
+            <!-- 社交分类 -->
+            <div id="content-social" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://wx.qq.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/wx.qq.com?size=64" alt="微信" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#07c160] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>微</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">微信</span>
+                </a>
+                <a href="https://im.qq.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/qq.com?size=64" alt="QQ" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#12b7f5] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>Q</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">QQ</span>
+                </a>
+                <a href="https://qzone.qq.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/qzone.qq.com?size=64" alt="QQ空间" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ffce00] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>空</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">QQ空间</span>
+                </a>
+                <a href="https://tieba.baidu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/tieba.baidu.com?size=64" alt="百度贴吧" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2932e1] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>贴</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">百度贴吧</span>
+                </a>
+                <a href="https://www.douban.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/douban.com?size=64" alt="豆瓣" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2d963d] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>豆</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">豆瓣</span>
+                </a>
+                <a href="https://www.zhihu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/zhihu.com?size=64" alt="知乎" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#0066ff] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>知</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">知乎</span>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/x.com?size=64" alt="X(Twitter)" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-black flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>X</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">X(Twitter)</span>
+                </a>
+                <a href="https://www.facebook.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/facebook.com?size=64" alt="Facebook" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#1877f2] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>F</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">Facebook</span>
+                </a>
+            </div>
+
+            <!-- 视频分类 -->
+            <div id="content-video" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://www.bilibili.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/bilibili.com?size=64" alt="哔哩哔哩" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#fb7299] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>B</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">哔哩哔哩</span>
+                </a>
+                <a href="https://www.youtube.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/youtube.com?size=64" alt="YouTube" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff0000] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>Y</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">YouTube</span>
+                </a>
+                <a href="https://www.iqiyi.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/iqiyi.com?size=64" alt="爱奇艺" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#00be06] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>爱</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">爱奇艺</span>
+                </a>
+                <a href="https://v.qq.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/v.qq.com?size=64" alt="腾讯视频" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff6600] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>腾</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">腾讯视频</span>
+                </a>
+                <a href="https://www.youku.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/youku.com?size=64" alt="优酷" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#19b9f4] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>优</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">优酷</span>
+                </a>
+                <a href="https://www.mgtv.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/mgtv.com?size=64" alt="芒果TV" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff5f00] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>芒</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">芒果TV</span>
+                </a>
+                <a href="https://music.163.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/music.163.com?size=64" alt="网易云音乐" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#c20c0c] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>网</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">网易云音乐</span>
+                </a>
+                <a href="https://y.qq.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/y.qq.com?size=64" alt="QQ音乐" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#31c27c] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>Q</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">QQ音乐</span>
+                </a>
+            </div>
+
+            <!-- 购物分类 -->
+            <div id="content-shopping" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://www.taobao.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/taobao.com?size=64" alt="淘宝" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff4400] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>淘</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">淘宝</span>
+                </a>
+                <a href="https://www.jd.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/jd.com?size=64" alt="京东" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#e1251b] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>京</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">京东</span>
+                </a>
+                <a href="https://www.pinduoduo.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/pinduoduo.com?size=64" alt="拼多多" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#e02e24] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>拼</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">拼多多</span>
+                </a>
+                <a href="https://www.tmall.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/tmall.com?size=64" alt="天猫" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff0036] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>天</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">天猫</span>
+                </a>
+                <a href="https://www.amazon.cn" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/amazon.cn?size=64" alt="亚马逊" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff9900] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>A</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">亚马逊</span>
+                </a>
+                <a href="https://www.suning.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/suning.com?size=64" alt="苏宁易购" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ffaa00] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>苏</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">苏宁易购</span>
+                </a>
+                <a href="https://www.vip.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/vip.com?size=64" alt="唯品会" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff0036] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>唯</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">唯品会</span>
+                </a>
+                <a href="https://www.meituan.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/meituan.com?size=64" alt="美团" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ffc300] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>美</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">美团</span>
+                </a>
+            </div>
+
+            <!-- 工具分类 -->
+            <div id="content-tools" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://pan.baidu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/pan.baidu.com?size=64" alt="百度网盘" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2932e1] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>盘</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">百度网盘</span>
+                </a>
+                <a href="https://www.aliyundrive.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/aliyundrive.com?size=64" alt="阿里云盘" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff6a00] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>阿</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">阿里云盘</span>
+                </a>
+                <a href="https://www.12306.cn" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/12306.cn?size=64" alt="铁路12306" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2156a3] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow text-sm\'>12306</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">铁路12306</span>
+                </a>
+                <a href="https://amap.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/amap.com?size=64" alt="高德地图" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#00b3ff] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>高</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">高德地图</span>
+                </a>
+                <a href="https://map.baidu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/map.baidu.com?size=64" alt="百度地图" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2932e1] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>百</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">百度地图</span>
+                </a>
+                <a href="https://www.kuaidi100.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/kuaidi100.com?size=64" alt="快递100" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff6600] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>快</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">快递100</span>
+                </a>
+                <a href="https://fanyi.baidu.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/fanyi.baidu.com?size=64" alt="百度翻译" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2932e1] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>译</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">百度翻译</span>
+                </a>
+                <a href="https://www.deepl.com/translator" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/deepl.com?size=64" alt="DeepL翻译" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#042b54] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>D</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">DeepL翻译</span>
+                </a>
+            </div>
+
+            <!-- 学习分类 -->
+            <div id="content-study" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://www.icourse163.org" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/icourse163.org?size=64" alt="中国大学MOOC" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#2d79b5] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow text-xs\'>MOOC</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">中国大学MOOC</span>
+                </a>
+                <a href="https://study.163.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/study.163.com?size=64" alt="网易云课堂" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#d81e06] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>网</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">网易云课堂</span>
+                </a>
+                <a href="https://www.coursera.org" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/coursera.org?size=64" alt="Coursera" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#0056d2] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>C</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">Coursera</span>
+                </a>
+                <a href="https://www.cnki.net" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/cnki.net?size=64" alt="中国知网" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#003c78] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>知</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">中国知网</span>
+                </a>
+                <a href="https://www.bilibili.com/v/knowledge" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/bilibili.com?size=64" alt="B站课堂" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#fb7299] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>B</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">B站课堂</span>
+                </a>
+                <a href="https://www.xuetangx.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/xuetangx.com?size=64" alt="学堂在线" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#1e6bb8] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>学</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">学堂在线</span>
+                </a>
+                <a href="https://www.youdao.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/youdao.com?size=64" alt="有道词典" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#ff5722] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>有</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">有道词典</span>
+                </a>
+                <a href="https://www.zxxk.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/zxxk.com?size=64" alt="学科网" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#0070c0] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>学</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">学科网</span>
+                </a>
+            </div>
+
+            <!-- 开发分类 -->
+            <div id="content-dev" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <a href="https://github.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/github.com?size=64" alt="GitHub" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#24292f] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow text-sm\'>Git</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">GitHub</span>
+                </a>
+                <a href="https://gitee.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/gitee.com?size=64" alt="Gitee码云" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#c71d23] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>码</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">Gitee码云</span>
+                </a>
+                <a href="https://stackoverflow.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/stackoverflow.com?size=64" alt="Stack Overflow" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#f48024] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>S</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">Stack Overflow</span>
+                </a>
+                <a href="https://developer.mozilla.org/zh-CN" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/developer.mozilla.org?size=64" alt="MDN文档" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-black flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow text-sm\'>MDN</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">MDN文档</span>
+                </a>
+                <a href="https://juejin.cn" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/juejin.cn?size=64" alt="掘金" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#1e80ff] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>掘</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">掘金</span>
+                </a>
+                <a href="https://www.csdn.net" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/csdn.net?size=64" alt="CSDN" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#fc5531] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>C</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">CSDN</span>
+                </a>
+                <a href="https://www.npmjs.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/npmjs.com?size=64" alt="NPM" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#cb3837] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>npm</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">NPM</span>
+                </a>
+                <a href="https://code.visualstudio.com" target="_blank" class="card-hover glass rounded-xl shadow-md p-4 flex items-center gap-3 group">
+                    <img src="https://favicon.im/code.visualstudio.com?size=64" alt="VS Code" class="w-11 h-11 rounded-lg object-contain shrink-0 shadow-md group-hover:shadow-lg transition-shadow" onerror="this.onerror=null; this.outerHTML='<div class=\'w-11 h-11 rounded-lg bg-[#007acc] flex items-center justify-center text-white font-bold shrink-0 shadow-md group-hover:shadow-lg transition-shadow\'>VS</div>'">
+                    <span class="text-gray-800 dark:text-white font-medium">VS Code</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 底部版权 -->
+        <footer class="mt-12 text-center text-white/80 text-sm drop-shadow-md">
+            <p>© 2026 123456导航 · 让小白上网更轻松</p>
+        </footer>
+    </div>
+
+    <script>
+        // 时间更新
+        function updateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const weekDay = weekDays[now.getDay()];
+            document.getElementById('time').textContent = `${year}-${month}-${day} ${hours}:${minutes} ${weekDay}`;
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // 搜索功能
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const engine = document.getElementById('searchEngine').value;
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (keyword) {
+                window.open(engine + encodeURIComponent(keyword), '_blank');
+            }
+        });
+
+        // 标签切换
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 移除所有激活状态
+                tabBtns.forEach(b => {
+                    b.classList.remove('tab-active');
+                    b.classList.add('glass', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-white/90', 'dark:hover:bg-slate-700/80');
+                });
+                // 添加当前激活状态
+                this.classList.add('tab-active');
+                this.classList.remove('glass', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-white/90', 'dark:hover:bg-slate-700/80');
+                
+                // 切换内容
+                const tab = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                const activeContent = document.getElementById(`content-${tab}`);
+                activeContent.style.display = 'grid';
+                
+                // 重触发动画
+                const cards = activeContent.querySelectorAll('.card-hover');
+                cards.forEach((card, index) => {
+                    card.style.animation = 'none';
+                    card.offsetHeight; // 触发重绘
+                    card.style.animation = `cardEnter 0.4s cubic-bezier(.2,.8,.2,1) ${index * 0.05}s backwards`;
+                });
+            });
+        });
+
+        // 深色模式切换
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // 初始卡片动画
+        const commonCards = document.querySelectorAll('#content-common .card-hover');
+        commonCards.forEach((card, index) => {
+            card.style.animation = `cardEnter 0.4s cubic-bezier(.2,.8,.2,1) ${index * 0.05}s backwards`;
+        });
+    </script>
+</body>
+</html><!--35575849922395614730100722-->
